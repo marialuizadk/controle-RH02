@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gerar Relatório</title>
+  <link rel="stylesheet" href="estilo.css" />
+  <script src="menu.js" defer></script>
+</head>
+<body>
+
+<nav id="menu"></nav>
+
+<main class="container">
+  <h1>Gerar Relatório</h1>
+
+  <form id="formRelatorio">
+    <label for="dataInicio">Data Início:</label>
+    <input type="date" id="dataInicio" required />
+
+    <label for="dataFim">Data Fim:</label>
+    <input type="date" id="dataFim" required />
+
+    <button type="submit">Gerar</button>
+  </form>
+
+  <div id="resultado" style="margin-top: 25px; text-align: left; max-height: 400px; overflow-y: auto; border: 1px solid #d6336c; border-radius: 12px; padding: 15px; background: #fff;"></div>
+</main>
+
+<script>
+  const form = document.getElementById('formRelatorio');
+  const resultado = document.getElementById('resultado');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const inicio = form.dataInicio.value;
+    const fim = form.dataFim.value;
+
+    if (!inicio || !fim || fim < inicio) {
+      alert('Preencha datas válidas');
+      return;
+    }
+
+    function filtrarPorData(arr, campo) {
+      return arr.filter(item => item[campo] >= inicio && item[campo] <= fim);
+    }
+
+    const ativos = JSON.parse(localStorage.getItem('funcionariosAtivos')) || [];
+    const inativos = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+    const ferias = JSON.parse(localStorage.getItem('ferias')) || [];
+    const demissoes = JSON.parse(localStorage.getItem('demissoes')) || [];
+    const avisos = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
+
+    let html = '';
+
+    // Exemplo simples, pode melhorar conforme necessidade
+
+    html += `<h2>Funcionários Ativos (${ativos.length})</h2>`;
+    ativos.forEach(f => {
+      html += `<p>${f.nome} (CPF: ${f.cpf}) - Local: ${f.local}</p>`;
+    });
+
+    html += `<h2>Funcionários Inativos (${inativos.length})</h2>`;
+    inativos.forEach(f => {
+      html += `<p>${f.nome} (CPF: ${f.cpf}) - Local: ${f.local}</p>`;
+    });
+
+    html += `<h2>Férias registradas (${ferias.length})</h2>`;
+    ferias.forEach(f => {
+      html += `<p>${f.nome} - ${f.dataInicio} a ${f.dataFim}</p>`;
+    });
+
+    html += `<h2>Demissões (${demissoes.length})</h2>`;
+    demissoes.forEach(d => {
+      html += `<p>${d.nome} - ${d.data} - Motivo: ${d.motivo}</p>`;
+    });
+
+    html += `<h2>Aviso Prévio (${avisos.length})</h2>`;
+    avisos.forEach(a => {
+      html += `<p>${a.nome} - ${a.dataInicio} a ${a.dataFim} - Redução: ${a.reducao} dias</p>`;
+    });
+
+    resultado.innerHTML = html;
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registrar Demissão</title>
+  <link rel="stylesheet" href="estilo.css" />
+  <script src="menu.js" defer></script>
+</head>
+<body>
+
+<nav id="menu"></nav>
+
+<main class="container">
+  <h1>Registrar Demissão</h1>
+
+  <form id="formDemissao">
+    <label>Nome:
+      <input type="text" id="nome" required />
+    </label>
+    <label>CPF:
+      <input type="text" id="cpf" required />
+    </label>
+    <label>Data da Demissão:
+      <input type="date" id="data" required />
+    </label>
+    <label>Motivo:
+      <input type="text" id="motivo" required />
+    </label>
+    <label>Local:
+      <input type="text" id="local" required />
+    </label>
+
+    <button type="submit">Registrar Demissão</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>CPF</th>
+        <th>Data</th>
+        <th>Motivo</th>
+        <th>Local</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="listaDemissoes"></tbody>
+  </table>
+</main>
+
+<script>
+  const form = document.getElementById('formDemissao');
+  const tbody = document.getElementById('listaDemissoes');
+
+  function salvarDemissoes(dados) {
+    localStorage.setItem('demissoes', JSON.stringify(dados));
+  }
+
+  function salvarInativos(dados) {
+    localStorage.setItem('funcionariosInativos', JSON.stringify(dados));
+  }
+
+  function carregarDemissoes() {
+    const dados = JSON.parse(localStorage.getItem('demissoes')) || [];
+    tbody.innerHTML = '';
+    dados.forEach((item, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.nome}</td>
+        <td>${item.cpf}</td>
+        <td>${item.data}</td>
+        <td>${item.motivo}</td>
+        <td>${item.local}</td>
+        <td>
+          <button onclick="editar(${i})">Editar</button>
+          <button onclick="remover(${i})">Remover</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const nome = form.nome.value.trim();
+    const cpf = form.cpf.value.trim();
+    const data = form.data.value;
+    const motivo = form.motivo.value.trim();
+    const local = form.local.value.trim();
+
+    if (!nome || !cpf || !data || !motivo || !local) {
+      alert('Preencha todos os campos!');
+      return;
+    }
+
+    // Salvar demissão
+    const demissoes = JSON.parse(localStorage.getItem('demissoes')) || [];
+    demissoes.push({ nome, cpf, data, motivo, local });
+    salvarDemissoes(demissoes);
+
+    // Adicionar funcionário na lista de inativos
+    let inativos = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+
+    // Verificar se já existe para evitar duplicados (opcional)
+    const existe = inativos.some(f => f.cpf === cpf);
+    if (!existe) {
+      inativos.push({ nome, cpf, local });
+      salvarInativos(inativos);
+    }
+
+    form.reset();
+    carregarDemissoes();
+  });
+
+  function editar(i) {
+    const dados = JSON.parse(localStorage.getItem('demissoes')) || [];
+    const item = dados[i];
+
+    const novoNome = prompt('Editar nome:', item.nome);
+    if (novoNome === null) return;
+    const novoCpf = prompt('Editar CPF:', item.cpf);
+    if (novoCpf === null) return;
+    const novaData = prompt('Editar data:', item.data);
+    if (novaData === null) return;
+    const novoMotivo = prompt('Editar motivo:', item.motivo);
+    if (novoMotivo === null) return;
+    const novoLocal = prompt('Editar local:', item.local);
+    if (novoLocal === null) return;
+
+    if (!novoNome.trim() || !novoCpf.trim() || !novaData.trim() || !novoMotivo.trim() || !novoLocal.trim()) {
+      alert('Nenhum campo pode ficar vazio');
+      return;
+    }
+
+    dados[i] = {
+      nome: novoNome.trim(),
+      cpf: novoCpf.trim(),
+      data: novaData.trim(),
+      motivo: novoMotivo.trim(),
+      local: novoLocal.trim()
+    };
+    salvarDemissoes(dados);
+
+    // Atualizar também na lista de inativos
+    let inativos = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+    const indexInativo = inativos.findIndex(f => f.cpf === item.cpf);
+    if (indexInativo !== -1) {
+      inativos[indexInativo] = { nome: novoNome.trim(), cpf: novoCpf.trim(), local: novoLocal.trim() };
+      salvarInativos(inativos);
+    }
+
+    carregarDemissoes();
+  }
+
+  function remover(i) {
+    if (!confirm('Deseja realmente remover esta demissão?')) return;
+    const dados = JSON.parse(localStorage.getItem('demissoes')) || [];
+    const removido = dados.splice(i, 1)[0];
+    salvarDemissoes(dados);
+
+    // Remover da lista de inativos também
+    let inativos = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+    inativos = inativos.filter(f => f.cpf !== removido.cpf);
+    salvarInativos(inativos);
+
+    carregarDemissoes();
+  }
+
+  carregarDemissoes();
+</script>
+
+</body>
+</html>

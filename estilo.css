@@ -1,0 +1,116 @@
+/* Reset e base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+body {
+  background: #ffe6f0;
+  color: #d6336c;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 70px; /* espaço para menu fixo */
+}
+
+/* Menu fixo topo */
+nav#menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  padding: 18px 0;
+  z-index: 10000;
+  font-weight: 700;
+  font-size: 18px;
+  user-select: none;
+  flex-wrap: wrap;
+}
+nav#menu a {
+  color: #d6336c;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+nav#menu a:hover {
+  color: #a02947;
+}
+
+/* Container centralizado */
+main.container {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(214, 51, 108, 0.3);
+  max-width: 720px;
+  width: 90vw;
+  padding: 30px 40px;
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+/* Títulos */
+h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 30px;
+  color: #d6336c;
+}
+
+/* Formulários */
+form label {
+  display: block;
+  margin: 12px 0 6px 0;
+  font-weight: 700;
+  text-align: left;
+  color: #a02947;
+}
+form input[type="text"],
+form input[type="date"],
+form input[type="number"],
+form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 2px solid #d6336c;
+  border-radius: 10px;
+  transition: border-color 0.3s;
+}
+form input[type="text"]:focus,
+form input[type="date"]:focus,
+form input[type="number"]:focus,
+form textarea:focus {
+  border-color: #a02947;
+  outline: none;
+}
+
+/* Botões */
+button, .btn {
+  background-color: #d6336c;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 22px;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+button:hover, .btn:hover {
+  background-color: #a02947;
+}
+
+/* Tabela padronizada */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+  font-size: 1rem;

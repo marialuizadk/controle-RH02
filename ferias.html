@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lançar Férias</title>
+  <link rel="stylesheet" href="estilo.css" />
+  <script src="menu.js" defer></script>
+</head>
+<body>
+
+<nav id="menu"></nav>
+
+<main class="container">
+  <h1>Lançar Férias</h1>
+
+  <form id="formFerias">
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" required />
+
+    <label for="cpf">CPF:</label>
+    <input type="text" id="cpf" required />
+
+    <label for="dataInicio">Data Início:</label>
+    <input type="date" id="dataInicio" required />
+
+    <label for="dataFim">Data Fim:</label>
+    <input type="date" id="dataFim" required />
+
+    <button type="submit">Registrar Férias</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr><th>Nome</th><th>CPF</th><th>Data Início</th><th>Data Fim</th><th>Ações</th></tr>
+    </thead>
+    <tbody id="listaFerias"></tbody>
+  </table>
+</main>
+
+<script>
+  const form = document.getElementById('formFerias');
+  const tbody = document.getElementById('listaFerias');
+
+  function salvarFerias(dados) {
+    localStorage.setItem('ferias', JSON.stringify(dados));
+  }
+
+  function carregarFerias() {
+    const dados = JSON.parse(localStorage.getItem('ferias')) || [];
+    tbody.innerHTML = '';
+    dados.forEach((feria, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${feria.nome}</td>
+        <td>${feria.cpf}</td>
+        <td>${feria.dataInicio}</td>
+        <td>${feria.dataFim}</td>
+        <td>
+          <button onclick="editar(${i})">Editar</button>
+          <button onclick="remover(${i})">Remover</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const nome = form.nome.value.trim();
+    const cpf = form.cpf.value.trim();
+    const dataInicio = form.dataInicio.value;
+    const dataFim = form.dataFim.value;
+
+    if (!nome || !cpf || !dataInicio || !dataFim) {
+      alert('Preencha todos os campos');
+      return;
+    }
+
+    if (dataFim < dataInicio) {
+      alert('Data fim deve ser maior ou igual à data início');
+      return;
+    }
+
+    const dados = JSON.parse(localStorage.getItem('ferias')) || [];
+    dados.push({ nome, cpf, dataInicio, dataFim });
+    salvarFerias(dados);
+    form.reset();
+    carregarFerias();
+  });
+
+  function editar(i) {
+    const dados = JSON.parse(localStorage.getItem('ferias')) || [];
+    const f = dados[i];
+
+    const novoNome = prompt('Editar nome:', f.nome);
+    if (novoNome === null) return;
+    const novoCpf = prompt('Editar CPF:', f.cpf);
+    if (novoCpf === null) return;
+    const novoInicio = prompt('Editar data início:', f.dataInicio);
+    if (novoInicio === null) return;
+    const novoFim = prompt('Editar data fim:', f.dataFim);
+    if (novoFim === null) return;
+
+    if (!novoNome.trim() || !novoCpf.trim() || !novoInicio.trim() || !novoFim.trim()) {
+      alert('Nenhum campo pode ficar vazio');
+      return;
+    }
+
+    dados[i] = {
+      nome: novoNome.trim(),
+      cpf: novoCpf.trim(),
+      dataInicio: novoInicio.trim(),
+      dataFim: novoFim.trim()
+    };
+    salvarFerias(dados);
+    carregarFerias();
+  }
+
+  function remover(i) {
+    if (!confirm('Confirmar remoção?')) return;
+    const dados = JSON.parse(localStorage.getItem('ferias')) || [];
+    dados.splice(i, 1);
+    salvarFerias(dados);
+    carregarFerias();
+  }
+
+  carregarFerias();
+</script>
+
+</body>
+</html>

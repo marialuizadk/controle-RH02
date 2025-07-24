@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Funcionários Inativos</title>
+  <link rel="stylesheet" href="estilo.css" />
+  <script src="menu.js" defer></script>
+</head>
+<body>
+
+<nav id="menu"></nav>
+
+<main class="container">
+  <h1>Funcionários Inativos</h1>
+
+  <table>
+    <thead>
+      <tr><th>Nome</th><th>CPF</th><th>Local</th><th>Ações</th></tr>
+    </thead>
+    <tbody id="listaInativos"></tbody>
+  </table>
+</main>
+
+<script>
+  const tbody = document.getElementById('listaInativos');
+
+  function salvarInativos(dados) {
+    localStorage.setItem('funcionariosInativos', JSON.stringify(dados));
+  }
+
+  function carregarInativos() {
+    const dados = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+    tbody.innerHTML = '';
+    dados.forEach((func, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${func.nome}</td>
+        <td>${func.cpf}</td>
+        <td>${func.local}</td>
+        <td>
+          <button onclick="editar(${i})">Editar</button>
+          <button onclick="remover(${i})">Remover</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function editar(i) {
+    const dados = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+    const func = dados[i];
+
+    const novoNome = prompt('Editar nome:', func.nome);
+    if (novoNome === null) return;
+    const novoCpf = prompt('Editar CPF:', func.cpf);
+    if (novoCpf === null) return;
+    const novoLocal = prompt('Editar local:', func.local);
+    if (novoLocal === null) return;
+
+    if (!novoNome.trim() || !novoCpf.trim() || !novoLocal.trim()) {
+      alert('Nenhum campo pode ficar vazio');
+      return;
+    }
+
+    dados[i] = { nome: novoNome.trim(), cpf: novoCpf.trim(), local: novoLocal.trim() };
+    salvarInativos(dados);
+    carregarInativos();
+  }
+
+  function remover(i) {
+    if (!confirm('Confirmar remoção?')) return;
+    const dados = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+    dados.splice(i, 1);
+    salvarInativos(dados);
+    carregarInativos();
+  }
+
+  carregarInativos();
+</script>
+
+</body>
+</html>
